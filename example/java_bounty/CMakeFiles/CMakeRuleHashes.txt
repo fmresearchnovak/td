@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+6ede76ddb1693bf168b4321ba5dd66b7 CMakeFiles/build_java
+83b69a5b97565c781ccac549a04eff31 CMakeFiles/generate_javadoc
+dee3335b03e73f501b147cd2c5777600 CMakeFiles/td_generate_java_api
