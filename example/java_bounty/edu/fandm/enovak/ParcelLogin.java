@@ -1,5 +1,7 @@
 package edu.fandm.enovak;
 
+import edu.fandm.enovak.Client;
+
 
 /* My Main Class, this is a custom Telegram client. */
 public class ParcelLogin {
@@ -10,14 +12,23 @@ public class ParcelLogin {
     /* This is the main method (javadoc comments force me to write something here.) */
     public static void main(String[] args) throws InterruptedException {
 
-        Client c = new Client(null, null, null);
+        //Client c = new Client(new UpdateHandler(), null, null);
+        Client c = Client.create(new UpdateHandler(), null, null);
         System.out.println("Native client ID of c: " + c.getNativeClientId());
         System.out.println("Num clients: " + c.getClientCount());
 
-        //Client.execute(null);
+    }
 
+    private static class UpdateHandler implements Client.ResultHandler {
+        @Override
+        public void onResult(TdApi.Object object) {
+            System.out.println("onResult() called");
+            System.out.println("obj:" + object.toString());
+        }
     }
 }
+
+
     
     
     /*

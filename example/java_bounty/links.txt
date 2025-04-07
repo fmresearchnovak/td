@@ -25,10 +25,4 @@ A talk the drinkless guy gave on writing Telegram BOTS:
 https://www.youtube.com/watch?v=n9fZigZlzng
 
 Building:
-cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX:PATH=../../../tdlib -DTd_DIR:PATH=$(readlink -e ../td/lib/cmake/Td) ..
-
-cmake --build . --target installed
-
-Running:
-java -Djava.library.path=/path/to/libtdjni.so org.drinkless.tdlib.example.Example
-java -Djava.library.path=./ edu.fandm.enovak.ParcelLogin
+Run ./build.sh
