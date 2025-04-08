@@ -83,23 +83,21 @@ add_custom_target(build_java
   DEPENDS td_generate_java_api
 )
 
-set(JAVADOC_OUTPUT_DIR "${JAVA_OUTPUT_DIRECTORY}/../docs")
 
-add_custom_command(
-  OUTPUT ${JAVADOC_OUTPUT_DIR}/index.html # This is a file that will be created by javadoc
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVADOC_OUTPUT_DIR}
-  COMMAND ${Java_JAVADOC_EXECUTABLE} -encoding UTF-8 -charset UTF-8 -d "${JAVADOC_OUTPUT_DIR}" ${JAVA_SOURCE_FILES}
-  WORKING_DIRECTORY ${TD_API_JAVA_PATH}
-  DEPENDS ${JAVA_SOURCE_FILES} td_generate_java_api
-  COMMENT "Generating Javadoc documentation"
-  VERBATIM
-)
+if(EXISTS "${JAVA_OUTPUT_DIRECTORY}/../docs/index.html")
+  add_custom_target(generate_javadoc
+    COMMAND ${CMAKE_COMMAND} -E echo "Javadoc documentation already exists. Skipping generation"
+  )
 
-# Create the Javadoc target that depends on the custom command
-add_custom_target(generate_javadoc
-  DEPENDS ${JAVADOC_OUTPUT_DIR}/index.html
-  COMMENT "Generate Javadoc documentation"
-)
+else()
+  add_custom_target(generate_javadoc
+    COMMAND ${CMAKE_COMMAND} -E ${CMAKE_RM_COMMAND} "${JAVA_OUTPUT_DIRECTORY}/../docs"
+    COMMAND ${Java_JAVADOC_EXECUTABLE} -encoding UTF-8 -charset UTF-8 -d "${JAVA_OUTPUT_DIRECTORY}/../docs" ${JAVA_SOURCE_FILES}
+    WORKING_DIRECTORY ${TD_API_JAVA_PATH}
+    COMMENT "Generating Javadoc documentation"
+    DEPENDS td_generate_java_api
+  )
+endif()
 
 # Building shared library
 add_library(tdjni SHARED
