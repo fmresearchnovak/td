@@ -87,6 +87,9 @@ public class ParcelLogin {
                 if(authState.getConstructor() == TdApi.AuthorizationStateReady.CONSTRUCTOR){
                     System.out.println("LOGGED IN!");
                     currentlyAuthenticated = true;
+
+                    TdApi.InputMessageContent msg = new TdApi.InputMessageText(new TdApi.FormattedText("Hello from ParcelLogin!", null), null, true);
+                    c.send(new TdApi.SendMessage(1L, 0, null, null, null, msg), this);
                 }
             }
         }
