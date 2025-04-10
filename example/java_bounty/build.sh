@@ -7,9 +7,9 @@ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX:PATH=./ -DTd_DIR:PATH=$(re
 cmake --build . --target install
 
 cd ../
-echo -e "#!/bin/bash\ncd build/bin/\njava -Djava.library.path=./ edu.fandm.enovak.ParcelLogin" > run.sh
+echo -e "#!/bin/bash\ncd build/bin/\njava -Djava.library.path=./ edu.fandm.enovak.ParcelLogin \$1 \"\$2\"" > run.sh
 chmod +x run.sh
 
 echo "To run from the build/bin/ directory:"
 echo "java -Djava.library.path=./ edu.fandm.enovak.ParcelLogin"
-echo "Or execute ./run.sh"
+echo "Or execute ./run.sh <number> <msg>"
