@@ -35,8 +35,11 @@ if (TD_JSON_JAVA)
   #set(JAVA_EXAMPLE_FILES "${JAVA_SOURCE_PATH}/example/JsonExample.java")
   #set(JAVA_SOURCE_FILES "${JAVA_SOURCE_PATH}/JsonClient.java")
   set(JAVA_SOURCE_FILES 
-    "$(JAVA_SOURCE_PATH}/ParcelLogin.java"
-    "$(JAVA_SOURCE_PATH}/Client.java"
+    "${JAVA_SOURCE_PATH}/Client.java"
+    "${JAVA_SOURCE_PATH}/ParcelProbeImportContacts.java"
+    "${JAVA_SOURCE_PATH}/ParcelSendMessage.java" 
+    "${JAVA_SOURCE_PATH}/PrintOnlyHandler.java"
+
   )
 else()
   find_program(PHP_EXECUTABLE php)
@@ -61,8 +64,10 @@ else()
   #set(JAVA_EXAMPLE_FILES "${JAVA_SOURCE_PATH}/example/Example.java")
   #set(JAVA_SOURCE_FILES "${JAVA_SOURCE_PATH}/Client.java" "${JAVA_SOURCE_PATH}/TdApi.java")
   set(JAVA_SOURCE_FILES 
-    "${JAVA_SOURCE_PATH}/ParcelLogin.java" 
     "${JAVA_SOURCE_PATH}/Client.java"
+    "${JAVA_SOURCE_PATH}/ParcelProbeImportContacts.java"
+    "${JAVA_SOURCE_PATH}/ParcelSendMessage.java" 
+    "${JAVA_SOURCE_PATH}/PrintOnlyHandler.java" 
     "${JAVA_SOURCE_PATH}/TdApi.java"
   )
 endif()

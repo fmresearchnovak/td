@@ -6,8 +6,10 @@ import java.io.IOError;
 import java.io.IOException;
 
 
-/* My Main Class, this is a custom Telegram client. */
-public class ParcelLogin {
+/* This is a custom Telegram client
+ * This class Sends a given message to a given user (specified by their phone number)
+ */
+public class ParcelSendMessage {
 
     private static final String myPhoneNumber = "+18473088133";
     private static final int API_ID = 27834364; /* YOUR_API_ID */;
@@ -40,7 +42,7 @@ public class ParcelLogin {
             throw new IOError(new IOException("Write access to the current directory is required"));
         }
 
-        c = Client.create(new UpdateHandler(), new printOnlyRequestHandler(), new printOnlyRequestHandler());
+        c = Client.create(new UpdateHandler(), new PrintOnlyHandler(), new PrintOnlyHandler());
         System.out.println("Native client ID of c: " + c.getNativeClientId());
         System.out.println("Num clients: " + c.getClientCount());
 
@@ -229,21 +231,6 @@ public class ParcelLogin {
             } else{
                 System.err.println("Receive wrong response from TDLib:" + object);
             }
-        }
-    }
-
-    private static class printOnlyRequestHandler implements Client.ResultHandler,Client.ExceptionHandler {
-        @Override
-        public void onResult(TdApi.Object obj){
-            System.out.println("Handling result by printing");
-            System.out.println("obj:\n" + obj.toString());
-
-        }
-
-        @Override
-        public void onException(Throwable t){
-            System.out.println("Handling exception by printing");
-            System.out.println("t:\n" + t.toString());
         }
     }
 }
