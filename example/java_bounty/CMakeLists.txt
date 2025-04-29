@@ -36,6 +36,7 @@ if (TD_JSON_JAVA)
   #set(JAVA_SOURCE_FILES "${JAVA_SOURCE_PATH}/JsonClient.java")
   set(JAVA_SOURCE_FILES 
     "${JAVA_SOURCE_PATH}/Client.java"
+    "${JAVA_SOURCE_PATH}/ParcelSendVCardMessage.java"
     "${JAVA_SOURCE_PATH}/ParcelProbeImportContacts.java"
     "${JAVA_SOURCE_PATH}/ParcelSendMessage.java" 
     "${JAVA_SOURCE_PATH}/PrintOnlyHandler.java"
@@ -65,6 +66,7 @@ else()
   #set(JAVA_SOURCE_FILES "${JAVA_SOURCE_PATH}/Client.java" "${JAVA_SOURCE_PATH}/TdApi.java")
   set(JAVA_SOURCE_FILES 
     "${JAVA_SOURCE_PATH}/Client.java"
+    "${JAVA_SOURCE_PATH}/ParcelSendVCardMessage.java"
     "${JAVA_SOURCE_PATH}/ParcelProbeImportContacts.java"
     "${JAVA_SOURCE_PATH}/ParcelSendMessage.java" 
     "${JAVA_SOURCE_PATH}/PrintOnlyHandler.java" 

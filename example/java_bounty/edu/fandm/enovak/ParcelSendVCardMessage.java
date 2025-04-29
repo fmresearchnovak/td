@@ -7,18 +7,19 @@ import java.io.IOException;
 
 
 /* This is a custom Telegram client
- * This class is used to experiment and problem the ImportContacts functionality of the API
+ * This class Sends a given message to a given user (specified by their phone number)
  */
-public class ParcelProbeImportContacts {
+public class ParcelSendVCardMessage {
 
     private static final String myPhoneNumber = "+18473088133";
     private static final int API_ID = 27834364; /* YOUR_API_ID */;
     private static final String API_HASH = "8e15eadf93ae7b548e3c17b01d5b3c76"; /* YOUR_API_HASH */;
 
-    private static boolean currentlyAuthenticated = false;
-    private static String number; // e.g., +12225550123
-    private static boolean done = false;
+    private static volatile boolean currentlyAuthenticated = false;
+    private static boolean msgSent = false;
 
+    private static String recipientPhoneNumber; // e.g., +12225550123
+    private static String vCard; // e.g., "BEGIN:VCARD\nVERSION:3.0\nFN:Alice Smith\nTEL;TYPE=cell:+1234567890\nEMAIL:
 
     private static Client c;
 
@@ -30,7 +31,22 @@ public class ParcelProbeImportContacts {
             System.out.println("arg[" + i + "]:" + args[i]);
         }
 
-        number = args[0];
+        recipientPhoneNumber = args[0];
+        String pathToVCard = args[1];
+
+        // read the vCard file
+        StringBuilder vCardBuilder = new StringBuilder();
+        try (Scanner scanner = new Scanner(new java.io.File(pathToVCard))){
+            while (scanner.hasNextLine()) {
+                vCardBuilder.append(scanner.nextLine()).append("\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading vCard file: " + e.getMessage());
+            return;
+        }
+
+        vCard = vCardBuilder.toString();
+        System.out.println("Sending \"" + vCard + "\" to " + recipientPhoneNumber);
 
 
         try {
@@ -40,8 +56,7 @@ public class ParcelProbeImportContacts {
         }
 
         c = Client.create(new UpdateHandler(), new PrintOnlyHandler(), new PrintOnlyHandler());
-        System.out.println("Native client ID of c: " + c.getNativeClientId());
-        System.out.println("Num clients: " + c.getClientCount());
+        System.out.println("Native client ID: " + c.getNativeClientId());;
 
 
         while(currentlyAuthenticated != true){
@@ -51,23 +66,14 @@ public class ParcelProbeImportContacts {
         }
 
 
-        String vcard = """
-BEGIN:VCARD
-VERSION:3.0
-FN:Alice Smith
-TEL;TYPE=cell:+1234567890
-EMAIL:alice@example.com
-ORG:Example Inc.
-END:VCARD""";
-
         // Most parameters we don't know, so fill them with placeholder values
-        TdApi.Contact recipient = new TdApi.Contact(number, "First Name", "Last Name", vcard, 0);
+        TdApi.Contact recipient = new TdApi.Contact(recipientPhoneNumber, "First Name", "Last Name", "", 0);
         TdApi.ImportContacts request = new TdApi.ImportContacts(new TdApi.Contact[]{recipient});
         System.out.println("Sending request: " + request.toString());
         c.send(request, new ImportResultHandler());
 
 
-        while(done != true){
+        while(msgSent != true){
             try{
                 Thread.sleep(1000); // sleep for 1 second
             } catch (InterruptedException ie) {};
@@ -76,20 +82,30 @@ END:VCARD""";
         System.out.println("main() ending");
     }
 
+    private String parseVCardFields(String vCard){
+        return "";
+    }
+
     private static class UpdateHandler implements Client.ResultHandler {
         @Override
         public void onResult(TdApi.Object object) {
-            //System.out.println("UpdateHandler.onResult() called");
-            //System.out.println("obj:" + object.toString());
+            System.out.println("UpdateHandler.onResult() called");
+            System.out.println("obj:" + object.toString());
 
             if(object.getConstructor() == TdApi.UpdateAuthorizationState.CONSTRUCTOR){
                 doAuthorizationSequence(object);
-            } else if(object.getConstructor() == TdApi.UpdateUser.CONSTRUCTOR){
-                System.out.println("UpdateHandler.onResult() called for UpdateUser");
-                System.out.println("obj: " + object.toString());
-                TdApi.UpdateUser updateUser = (TdApi.UpdateUser) object;
-                //System.out.println("UpdateUser: " + updateUser.user.toString());
             }
+
+            if(object.getConstructor() == TdApi.Chats.CONSTRUCTOR){
+                TdApi.Chats chats = (TdApi.Chats) object;
+
+                System.out.println("Num Chat: " + chats.totalCount);
+                for(int i = 0; i < chats.chatIds.length; i++){
+                    System.out.println("Chat ID: " + chats.chatIds[i]);
+                }
+
+            }
+
         }
 
 
@@ -137,6 +153,16 @@ END:VCARD""";
             if(authState.getConstructor() == TdApi.AuthorizationStateReady.CONSTRUCTOR){
                 System.out.println("LOGGED IN!");
                 currentlyAuthenticated = true;
+
+                // This should send updates
+                //c.send(new TdApi.LoadChats(new TdApi.ChatListMain(), Integer.MAX_VALUE), new ChatListHandler());
+
+
+                // request for update to get all chat IDs
+                // sends back a "Chats" object
+                System.out.println("Sending request for chat list");
+                c.send(new TdApi.GetChats(new TdApi.ChatListMain(), 100), this);
+                
             }
 
 
@@ -149,7 +175,6 @@ END:VCARD""";
                 System.out.println("Closing");
             }
             if(authState.getConstructor() == TdApi.AuthorizationStateClosed.CONSTRUCTOR){
-                currentlyAuthenticated = false;
                 System.out.println("Authorization State Closed");
                 System.exit(0);
             }
@@ -159,23 +184,70 @@ END:VCARD""";
     private static class ImportResultHandler implements Client.ResultHandler {
         @Override
         public void onResult(TdApi.Object object){
-            System.out.println("ImportResultHandler.onResult() called");
-            System.out.println("obj:" + object.toString());
-            System.out.println("obj.getConstructor():" + object.getConstructor());
-
             if(object.getConstructor() == TdApi.ImportedContacts.CONSTRUCTOR){
                 TdApi.ImportedContacts importedContacts = (TdApi.ImportedContacts)object;
-                System.out.println("Found contacts for phone number " + number.toString());
+                System.out.println("Found contacts for phone number " + recipientPhoneNumber.toString());
                 for(int i = 0; i < importedContacts.userIds.length; i++){
                     System.out.println("\tID:" + importedContacts.userIds[i]);
                 }
 
-                if(importedContacts.userIds.length == 0){
-                    System.out.println("Could not find Telegram user for number: " + number.toString());
+                if(importedContacts.userIds.length == 1){
+                    long id = importedContacts.userIds[0];
+                    // passing "true" creates the chat without any network request / verification.
+                    // so the whole chat (recipient name, number, pre-existing messages) may be invalid.
+                    TdApi.CreatePrivateChat createChatRequest = new TdApi.CreatePrivateChat(id, false);
+                    System.out.println("Sending request: " + createChatRequest.toString());
+                    c.send(createChatRequest, new PrivateChatHandler());
+                } else {
+                    System.out.println("Failed to get user for number: " + recipientPhoneNumber);
                     System.out.println(object);
                 }
+            }
+        }
+    }
+    
+    private static class PrivateChatHandler implements Client.ResultHandler {
+        @Override
+        public void onResult(TdApi.Object object){
+            if(object.getConstructor() == TdApi.Chat.CONSTRUCTOR){
+                System.out.println("Established private chat for " + recipientPhoneNumber);
+                TdApi.Chat chat = (TdApi.Chat)object;
 
-                done = true;
+                TdApi.Contact randomVCardContact = new TdApi.Contact(recipientPhoneNumber, "Fake First Name", "Fake Last Name", vCard, 0);
+                TdApi.InputMessageContact msg = new TdApi.InputMessageContact(randomVCardContact);
+                TdApi.SendMessage sendMessageReq = new TdApi.SendMessage(chat.id, 0, null, null, null, msg);
+                System.out.println("Sending request to send message: " + sendMessageReq.toString());
+                c.send(sendMessageReq, this);
+                System.out.println("Sent vCard to " + recipientPhoneNumber);
+                msgSent = true;
+            } else {
+                System.out.println("Failed to establish chat for user");
+                System.out.println(object);
+            }
+        }
+    }
+
+    private static class ChatListHandler implements Client.ResultHandler {
+        @Override
+        public void onResult(TdApi.Object object) {
+            System.out.println("ChatListHandler.onResult() called");
+            System.out.println("obj:" + object.toString());
+
+            if(object.getConstructor() == TdApi.Error.CONSTRUCTOR){
+                TdApi.Error err = (TdApi.Error) object;
+                System.out.println("Error: " + err.message);
+                System.out.println("Error code: " + err.code);
+                if(err.code == 404){
+                    System.out.println("Full chat list recieved");
+
+                    TdApi.InputMessageContent msg = new TdApi.InputMessageText(new TdApi.FormattedText("Hello from ParcelLogin!", null), null, true);
+                    System.out.println("Sending request: " + msg.toString());
+                    c.send(new TdApi.SendMessage(1L, 0, null, null, null, msg), this);
+                }
+            } else if(object.getConstructor() == TdApi.Ok.CONSTRUCTOR){
+                System.out.println("Ok");
+            } else{
+                System.err.println("Receive wrong response from TDLib:" + object);
             }
         }
     }
