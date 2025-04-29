@@ -213,7 +213,7 @@ public class ParcelSendVCardMessage {
                 System.out.println("Established private chat for " + recipientPhoneNumber);
                 TdApi.Chat chat = (TdApi.Chat)object;
 
-                TdApi.Contact randomVCardContact = new TdApi.Contact(recipientPhoneNumber, "Fake First Name", "Fake Last Name", vCard, 0);
+                TdApi.Contact randomVCardContact = new TdApi.Contact(recipientPhoneNumber, "FAlice", "FSmith", vCard, 0);
                 TdApi.InputMessageContact msg = new TdApi.InputMessageContact(randomVCardContact);
                 TdApi.SendMessage sendMessageReq = new TdApi.SendMessage(chat.id, 0, null, null, null, msg);
                 System.out.println("Sending request to send message: " + sendMessageReq.toString());
