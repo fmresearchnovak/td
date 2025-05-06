@@ -69,7 +69,7 @@ include CMakeFiles/generate_javadoc.dir/progress.make
 CMakeFiles/generate_javadoc:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/ed/td/example/java_bounty/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Javadoc documentation"
 	/usr/bin/cmake -E rm -rf -- /home/ed/td/example/java_bounty/bin/../docs
-	/usr/bin/javadoc -encoding UTF-8 -charset UTF-8 -d /home/ed/td/example/java_bounty/bin/../docs /home/ed/td/example/java_bounty/edu/fandm/enovak/ParcelLogin.java /home/ed/td/example/java_bounty/edu/fandm/enovak/Client.java /home/ed/td/example/java_bounty/edu/fandm/enovak/TdApi.java
+	/usr/bin/javadoc -encoding UTF-8 -charset UTF-8 -d /home/ed/td/example/java_bounty/bin/../docs /home/ed/td/example/java_bounty/edu/fandm/enovak/Client.java /home/ed/td/example/java_bounty/edu/fandm/enovak/ParcelSendVCardMessage.java /home/ed/td/example/java_bounty/edu/fandm/enovak/ParcelProbeImportContacts.java /home/ed/td/example/java_bounty/edu/fandm/enovak/ParcelSendMessage.java /home/ed/td/example/java_bounty/edu/fandm/enovak/PrintOnlyHandler.java /home/ed/td/example/java_bounty/edu/fandm/enovak/TdApi.java
 
 generate_javadoc: CMakeFiles/generate_javadoc
 generate_javadoc: CMakeFiles/generate_javadoc.dir/build.make
