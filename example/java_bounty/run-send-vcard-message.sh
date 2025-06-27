@@ -4,10 +4,12 @@
 
 # convert second parameter from relative file path to absolute file path
 if [ -n "$2" ]; then
-  abs_path=$(readlink -e "$2")
+	ABS_PATH=$(readlink -f "$2" 2>/dev/null)
 else
-  abs_path=""
+    echo "Missing required command line parameters"
+    exit 1
 fi
 
 cd build/bin/
-java -Djava.library.path=./ edu.fandm.enovak.ParcelSendVCardMessage $1 $abs_path
+java -Djava.library.path=./ edu.fandm.enovak.ParcelSendVCardMessage $1 "$ABS_PATH" 
+

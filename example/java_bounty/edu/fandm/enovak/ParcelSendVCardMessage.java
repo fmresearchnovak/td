@@ -82,6 +82,7 @@ public class ParcelSendVCardMessage {
         System.out.println("main() ending");
     }
 
+    // TODO: Finish this!
     private String parseVCardFields(String vCard){
         return "";
     }
@@ -212,8 +213,7 @@ public class ParcelSendVCardMessage {
             if(object.getConstructor() == TdApi.Chat.CONSTRUCTOR){
                 System.out.println("Established private chat for " + recipientPhoneNumber);
                 TdApi.Chat chat = (TdApi.Chat)object;
-
-                TdApi.Contact randomVCardContact = new TdApi.Contact("+1234567890", "FAlice", "FSmith", vCard, 0);
+                TdApi.Contact randomVCardContact = new TdApi.Contact("+1234567890", "TD_API_Name", "TD_API_Last_Name", vCard, 0);
                 TdApi.InputMessageContact msg = new TdApi.InputMessageContact(randomVCardContact);
                 TdApi.SendMessage sendMessageReq = new TdApi.SendMessage(chat.id, 0, null, null, null, msg);
                 System.out.println("Sending request to send message: " + sendMessageReq.toString());
