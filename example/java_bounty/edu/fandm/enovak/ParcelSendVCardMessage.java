@@ -163,6 +163,7 @@ public class ParcelSendVCardMessage {
                 // request for update to get all chat IDs
                 // sends back a "Chats" object
                 System.out.println("Sending request for chat list");
+                c.send(new TdApi.GetMe(), new GetMeHandler());
                 c.send(new TdApi.GetChats(new TdApi.ChatListMain(), 100), this);
                 
             }
@@ -179,6 +180,17 @@ public class ParcelSendVCardMessage {
             if(authState.getConstructor() == TdApi.AuthorizationStateClosed.CONSTRUCTOR){
                 System.out.println("Authorization State Closed");
                 System.exit(0);
+            }
+        }
+    }
+
+    private static class GetMeHandler implements Client.ResultHandler {
+        @Override
+        public void onResult(TdApi.Object object){
+            if(object.getConstructor() == TdApi.User.CONSTRUCTOR){
+                TdApi.User me = (TdApi.User) object;
+                System.out.println("Got my ID: " + me.id);
+                userIDPhoneNumberMap.put(me.id, myPhoneNumber);
             }
         }
     }
