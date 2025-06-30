@@ -4,6 +4,7 @@ package edu.fandm.enovak;
 import java.util.Scanner;
 import java.io.IOError;
 import java.io.IOException;
+import java.util.HashMap;
 
 
 /* This is a custom Telegram client
@@ -22,13 +23,14 @@ public class ParcelSendVCardMessage {
     private static String vCard; // e.g., "BEGIN:VCARD\nVERSION:3.0\nFN:Alice Smith\nTEL;TYPE=cell:+1234567890\nEMAIL:
 
     private static Client c;
+    private static HashMap<Long, String> userIDPhoneNumberMap = new HashMap<Long, String>(); // userID -> phone number map
 
     /* This is the main method (javadoc comments force me to write something here.) */
     public static void main(String[] args) throws InterruptedException {
 
         // print all args
         for(int i = 0; i < args.length; i++){
-            System.out.println("arg[" + i + "]:" + args[i]);
+            System.out.println("arg[" + i + "]: " + args[i]);
         }
 
         recipientPhoneNumber = args[0];
@@ -90,8 +92,8 @@ public class ParcelSendVCardMessage {
     private static class UpdateHandler implements Client.ResultHandler {
         @Override
         public void onResult(TdApi.Object object) {
-            System.out.println("UpdateHandler.onResult() called");
-            System.out.println("obj:" + object.toString());
+            //System.out.println("UpdateHandler.onResult() called");
+            //System.out.println("obj:" + object.toString());
 
             if(object.getConstructor() == TdApi.UpdateAuthorizationState.CONSTRUCTOR){
                 doAuthorizationSequence(object);
@@ -100,9 +102,9 @@ public class ParcelSendVCardMessage {
             if(object.getConstructor() == TdApi.Chats.CONSTRUCTOR){
                 TdApi.Chats chats = (TdApi.Chats) object;
 
-                System.out.println("Num Chat: " + chats.totalCount);
+                System.out.println("Number of Chats: " + chats.totalCount);
                 for(int i = 0; i < chats.chatIds.length; i++){
-                    System.out.println("Chat ID: " + chats.chatIds[i]);
+                    System.out.println("\tChat ID: " + chats.chatIds[i]);
                 }
 
             }
@@ -125,7 +127,7 @@ public class ParcelSendVCardMessage {
                 request.deviceModel = "Desktop";
                 request.applicationVersion = "1.0";
 
-                System.out.println("send request: " + request.toString());
+                //System.out.println("send request: " + request.toString());
                 c.send(request, this);
 
                 //c.send(new TdApi.GetOption("usd_to_thousand_star_rate"), null, null);
@@ -136,8 +138,7 @@ public class ParcelSendVCardMessage {
             }
 
             if(authState.getConstructor() == TdApi.AuthorizationStateWaitPhoneNumber.CONSTRUCTOR){
-                System.out.println("WHOA!");
-                System.out.println("sending phone number: " + myPhoneNumber.toString());
+                System.out.println("Sending phone number for auth: " + myPhoneNumber.toString());
                 c.send(new TdApi.SetAuthenticationPhoneNumber(myPhoneNumber, null), this);
             }
 
@@ -147,14 +148,14 @@ public class ParcelSendVCardMessage {
                 System.out.print("Enter Code:");
                 String code = s.nextLine();
                 TdApi.CheckAuthenticationCode req = new TdApi.CheckAuthenticationCode(code);
-                System.out.println("Sending request: " + req.toString());
+                //System.out.println("Sending request: " + req.toString());
                 c.send(req, this);
             }
 
             if(authState.getConstructor() == TdApi.AuthorizationStateReady.CONSTRUCTOR){
                 System.out.println("LOGGED IN!");
                 currentlyAuthenticated = true;
-
+                
                 // This should send updates
                 //c.send(new TdApi.LoadChats(new TdApi.ChatListMain(), Integer.MAX_VALUE), new ChatListHandler());
 
@@ -194,14 +195,14 @@ public class ParcelSendVCardMessage {
 
                 if(importedContacts.userIds.length == 1){
                     long id = importedContacts.userIds[0];
+                    userIDPhoneNumberMap.put(id, recipientPhoneNumber);
                     // passing "true" creates the chat without any network request / verification.
                     // so the whole chat (recipient name, number, pre-existing messages) may be invalid.
                     TdApi.CreatePrivateChat createChatRequest = new TdApi.CreatePrivateChat(id, false);
-                    System.out.println("Sending request: " + createChatRequest.toString());
+                    //System.out.println("Sending request: " + createChatRequest.toString());
                     c.send(createChatRequest, new PrivateChatHandler());
                 } else {
                     System.out.println("Failed to get user for number: " + recipientPhoneNumber);
-                    System.out.println(object);
                 }
             }
         }
@@ -212,21 +213,32 @@ public class ParcelSendVCardMessage {
         public void onResult(TdApi.Object object){
             if(object.getConstructor() == TdApi.Chat.CONSTRUCTOR){
                 System.out.println("Established private chat for " + recipientPhoneNumber);
+
                 TdApi.Chat chat = (TdApi.Chat)object;
                 TdApi.Contact randomVCardContact = new TdApi.Contact("+1234567890", "TD_API_Name", "TD_API_Last_Name", vCard, 0);
                 TdApi.InputMessageContact msg = new TdApi.InputMessageContact(randomVCardContact);
                 TdApi.SendMessage sendMessageReq = new TdApi.SendMessage(chat.id, 0, null, null, null, msg);
-                System.out.println("Sending request to send message: " + sendMessageReq.toString());
+                //System.out.println("Sending request to send message: " + sendMessageReq.toString());
                 c.send(sendMessageReq, this);
                 System.out.println("Sent vCard to " + recipientPhoneNumber);
                 msgSent = true;
+            } else if (object.getConstructor() == TdApi.Message.CONSTRUCTOR){
+                TdApi.Message msg = (TdApi.Message)object;
+                long userID = ((TdApi.MessageSenderUser)msg.senderId).userId;
+                String userphoneNumber = userIDPhoneNumberMap.get(userID);
+                System.out.println("Message in private chat w/" + userID + " (" + userphoneNumber + ")");
+                System.out.println("Message content: " + msg.content);
+
             } else {
-                System.out.println("Failed to establish chat for user");
+                System.out.println("Something weird happened in PrivateChatHandler");
+                System.out.println(object.getConstructor());
                 System.out.println(object);
+                System.exit(1);
             }
         }
     }
 
+    /***
     private static class ChatListHandler implements Client.ResultHandler {
         @Override
         public void onResult(TdApi.Object object) {
@@ -235,8 +247,8 @@ public class ParcelSendVCardMessage {
 
             if(object.getConstructor() == TdApi.Error.CONSTRUCTOR){
                 TdApi.Error err = (TdApi.Error) object;
-                System.out.println("Error: " + err.message);
-                System.out.println("Error code: " + err.code);
+                System.out.println("ChatListHandler Error: " + err.message);
+                System.out.println("\tcode: " + err.code);
                 if(err.code == 404){
                     System.out.println("Full chat list recieved");
 
@@ -247,8 +259,9 @@ public class ParcelSendVCardMessage {
             } else if(object.getConstructor() == TdApi.Ok.CONSTRUCTOR){
                 System.out.println("Ok");
             } else{
-                System.err.println("Receive wrong response from TDLib:" + object);
+                System.err.println("Received wrong response from TDLib:" + object);
             }
         }
     }
+    **/
 }
