@@ -33,6 +33,13 @@ public class ParcelSendVCardMessage {
             System.out.println("arg[" + i + "]: " + args[i]);
         }
 
+        
+        Scanner s = new Scanner(System.in);
+        System.out.print("Press Enter to continue...");
+        s.nextLine();
+        s.close();
+        
+
         recipientPhoneNumber = args[0];
         String pathToVCard = args[1];
 
@@ -227,7 +234,7 @@ public class ParcelSendVCardMessage {
                 System.out.println("Established private chat for " + recipientPhoneNumber);
 
                 TdApi.Chat chat = (TdApi.Chat)object;
-                TdApi.Contact randomVCardContact = new TdApi.Contact("+1234567890", "TD_API_Name", "TD_API_Last_Name", vCard, 0);
+                TdApi.Contact randomVCardContact = new TdApi.Contact("+1234567890", "", "😊", vCard, 0);
                 TdApi.InputMessageContact msg = new TdApi.InputMessageContact(randomVCardContact);
                 TdApi.SendMessage sendMessageReq = new TdApi.SendMessage(chat.id, 0, null, null, null, msg);
                 //System.out.println("Sending request to send message: " + sendMessageReq.toString());

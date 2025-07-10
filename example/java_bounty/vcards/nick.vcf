@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Nicholas;;;
+FN:Nicholas Carpenter
+ORG:Example Company Inc.
+TITLE:Software Engineer
+TEL;TYPE=CELL,VOICE:(203) 676-4973
+EMAIL;TYPE=PREF,INTERNET:ncarpent@fandm.edu
+ADR;TYPE=WORK,PREF:;;123 Main St;Anytown;CA;90210;USA
+URL:https://www.example.com
+NOTE:This is an example vCard for Nicholas.
+END:VCARD

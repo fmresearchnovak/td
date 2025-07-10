@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Ed Novak;;;
+FN:Ed
+ORG:Example Company Inc.
+TITLE:Software Engineer
+TEL;TYPE=CELL,VOICE:(847) 308-8133
+EMAIL;TYPE=PREF,INTERNET:enovak@fandm.edu
+ADR;TYPE=WORK,PREF:;;123 Main St;Anytown;CA;90210;USA
+URL:https://www.example.com
+NOTE:This is an example vCard for myself.
+END:VCARD

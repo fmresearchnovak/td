@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Doe;John;;;
+FN:John Doe
+ORG:Example Company Inc.
+TITLE:Software Engineer
+TEL;TYPE=WORK,VOICE:(123) 456-7890
+TEL;TYPE=CELL,VOICE:(987) 654-3210
+EMAIL;TYPE=PREF,INTERNET:john.doe@example.com
+ADR;TYPE=WORK,PREF:;;123 Main St;Anytown;CA;90210;USA
+URL:https://www.example.com
+NOTE:This is an example vCard for John Doe. This is an example vCard for John Doe.This is an example vCard for John Doe. This is an example vCard for John Doe. This is an example vCard for John Doe. This is an example vCard for John Doe. This is an example vCard for John Doe. This is an example vCard for John Doe. This is an example vCard for John Doe. This is an example vCard for John Doe. This is an example vCard for John Doe.
+END:VCARD
